@@ -72,12 +72,6 @@ const data = await response.json();
 
 let html = "";
 
-if(!data.articles){
-document.getElementById("news").innerHTML =
-"Unable to fetch news.";
-return;
-}
-
 data.forEach(article=>{
 
 html += `
