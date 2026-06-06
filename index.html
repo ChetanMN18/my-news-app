@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Chetan News Dashboard</title>
+
+<style>
+body{
+font-family: Arial, sans-serif;
+max-width:1000px;
+margin:auto;
+padding:20px;
+background:#f5f5f5;
+}
+
+button{
+padding:12px 20px;
+font-size:16px;
+cursor:pointer;
+}
+
+.news{
+background:white;
+padding:15px;
+margin-top:15px;
+border-radius:10px;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+a{
+text-decoration:none;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>📰 Chetan News Dashboard</h1>
+
+<button onclick="loadNews()">🔄 Refresh News</button>
+
+<div id="news"></div>
+
+<script>
+
+const API_KEY = "32d4772d0f2c4a149dd424e32320a16c";
+
+const query =
+"(India OR cricket OR RCB OR technology OR AI OR finance OR stocks OR \"One Piece\")";
+
+async function loadNews(){
+
+document.getElementById("news").innerHTML="Loading...";
+
+const url =
+`https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=30&apiKey=${API_KEY}`;
+
+const response = await fetch(url);
+const data = await response.json();
+
+let html = "";
+
+data.articles.forEach(article => {
+
+html += `
+<div class="news">
+<h3>${article.title}</h3>
+
+<p>${article.description || ""}</p>
+
+<a href="${article.url}" target="_blank">
+Read Full Article
+</a>
+</div>
+`;
+
+});
+
+document.getElementById("news").innerHTML = html;
+
+}
+
+loadNews();
+
+</script>
+
+</body>
+</html>
