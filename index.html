@@ -47,10 +47,25 @@ border-radius:8px;
 
 <h1>📰 Chetan News Dashboard</h1>
 
-<button onclick="loadNews()">🔄 Refresh News</button>
+<div style="margin-bottom:20px;">
+
+<button onclick="loadNews('all')">🏠 All</button>
+
+<button onclick="loadNews('cricket')">🏏 Cricket</button>
+
+<button onclick="loadNews('ai')">🤖 AI</button>
+
+<button onclick="loadNews('finance')">💰 Finance</button>
+
+<button onclick="loadNews('india')">🇮🇳 India</button>
+
+<button onclick="loadNews('onepiece')">☠️ One Piece</button>
+
+<button onclick="loadNews()">🔄 Refresh</button>
+
+</div>
 
 <div id="news">Loading...</div>
-
 <script>
 
 async function loadNews(){
