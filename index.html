@@ -68,7 +68,7 @@ border-radius:8px;
 <div id="news">Loading...</div>
 <script>
 
-async function loadNews(){
+async function loadNews(topic='all'){
 
 const newsDiv = document.getElementById("news");
 newsDiv.innerHTML = "Loading news...";
@@ -76,7 +76,7 @@ newsDiv.innerHTML = "Loading news...";
 try{
 
 const response = await fetch(
-"https://my-news-api.cnucchi.workers.dev/"
+`https://my-news-api.cnucchi.workers.dev/?topic=${topic}`
 );
 
 const data = await response.json();
