@@ -2,15 +2,125 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chetan News Dashboard V5</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:auto;max-width:1200px;padding:15px;background:#f4f4f4;color:#222}
+body.dark{background:#121212;color:#fff}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+button,input{padding:10px;border-radius:8px;border:1px solid #ccc}
+button{cursor:pointer}
+.card{background:#fff;margin:15px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.dark .card{background:#1e1e1e}
+.card img{width:100%;height:220px;object-fit:cover}
+.content{padding:15px}
+.badge{display:inline-block;background:#ddd;padding:4px 8px;border-radius:20px;font-size:12px}
+.meta{font-size:13px;opacity:.8}
+</style>
 </head>
 <body>
-<h1>Chetan News Dashboard V5</h1>
-<p>This is the generated V5 template file. Replace the API URL if needed and extend styling as desired.</p>
+<h1>📰 Chetan News Dashboard V5</h1>
+
+<div class="controls">
+<button onclick="toggleTheme()">🌙 Theme</button>
+<button onclick="loadNews('all')">All</button>
+<button onclick="loadNews('india')">India</button>
+<button onclick="loadNews('karnataka')">Karnataka</button>
+<button onclick="loadNews('world')">World</button>
+<button onclick="loadNews('cricket')">Cricket</button>
+<button onclick="loadNews('ai')">AI</button>
+<button onclick="loadNews('finance')">Finance</button>
+<button onclick="loadNews('positive')">Positive</button>
+<button onclick="showSaved()">⭐ Saved</button>
+</div>
+
+<input id="search" placeholder="Search..." onkeyup="searchNews()" style="width:100%">
+
+<div id="brief"><h3>🧠 AI Brief</h3><ul id="briefList"></ul></div>
+<div id="stats"></div>
+<div id="news">Loading...</div>
+
 <script>
 const API="https://my-news-api.cnucchi.workers.dev";
-console.log("V5 template loaded", API);
+let allArticles=[],visible=20,current='all';
+
+function rel(ts){
+ if(!ts) return "";
+ let s=Math.floor((Date.now()-ts)/1000);
+ if(s<60) return "Just now";
+ if(s<3600) return Math.floor(s/60)+"m ago";
+ if(s<86400) return Math.floor(s/3600)+"h ago";
+ return Math.floor(s/86400)+"d ago";
+}
+
+async function loadNews(topic='all'){
+ current=topic;
+ visible=20;
+ document.getElementById('news').innerHTML='Loading...';
+ let r=await fetch(API+'?topic='+topic);
+ allArticles=await r.json();
+ render();
+}
+
+function render(){
+ document.getElementById('stats').innerHTML='Articles: '+allArticles.length+' | Saved: '+saved().length;
+ let items=allArticles.slice(0,visible);
+ document.getElementById('news').innerHTML=items.map(a=>`
+ <div class="card">
+ <img src="${a.image}" onerror="this.style.display='none'">
+ <div class="content">
+ <div class="badge">${a.category}</div>
+ <h3>${a.title}</h3>
+ <p>${a.description||''}</p>
+ <div class="meta">${a.source} • ${rel(a.timestamp)}</div>
+ <p>${a.pubDate||''}</p>
+ <a href="${a.link}" target="_blank"><button>Read</button></a>
+ <button onclick="save('${a.link}')">${saved().some(x=>x.link===a.link)?'Unsave':'Save'}</button>
+ </div></div>`).join('');
+}
+
+function saved(){return JSON.parse(localStorage.getItem('savedNews')||'[]')}
+
+function save(link){
+ let s=saved();
+ let a=allArticles.find(x=>x.link===link);
+ let i=s.findIndex(x=>x.link===link);
+ if(i>=0)s.splice(i,1); else s.push(a);
+ localStorage.setItem('savedNews',JSON.stringify(s));
+ render();
+}
+
+function showSaved(){allArticles=saved();render();}
+
+function searchNews(){
+ let t=document.getElementById('search').value.toLowerCase();
+ let f=allArticles.filter(a=>(a.title||'').toLowerCase().includes(t)||(a.description||'').toLowerCase().includes(t));
+ document.getElementById('news').innerHTML=f.map(a=>`<div class="card"><img src="${a.image}"><div class="content"><h3>${a.title}</h3></div></div>`).join('');
+}
+
+function toggleTheme(){
+ document.body.classList.toggle('dark');
+ localStorage.setItem('theme',document.body.classList.contains('dark'));
+}
+
+if(localStorage.getItem('theme')==='true') document.body.classList.add('dark');
+
+window.addEventListener('scroll',()=>{
+ if(window.innerHeight+window.scrollY>=document.body.offsetHeight-300){
+   if(visible<allArticles.length){visible+=20;render();}
+ }
+});
+
+async function aiBrief(){
+ try{
+  let r=await fetch(API+'?topic=ai');
+  let a=await r.json();
+  document.getElementById('briefList').innerHTML=a.slice(0,5).map(x=>'<li>'+x.title+'</li>').join('');
+ }catch(e){}
+}
+
+aiBrief();
+loadNews();
 </script>
 </body>
 </html>
