@@ -3,158 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Chetan News Dashboard</title>
+<title>Chetan News Dashboard V4</title>
 
 <style>
-
-body{
-font-family:Arial,sans-serif;
-background:#f4f4f4;
-color:#222;
-max-width:1200px;
-margin:auto;
-padding:20px;
-transition:.3s;
-}
-
-body.dark{
-background:#121212;
-color:#fff;
-}
-
-h1{
-text-align:center;
-}
-
-.controls{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin-bottom:20px;
-}
-
-button{
-padding:10px 15px;
-cursor:pointer;
-border:none;
-border-radius:8px;
-}
-
-input{
-padding:10px;
-border-radius:8px;
-border:1px solid #ccc;
-flex:1;
-min-width:220px;
-}
-
-.stats{
-display:flex;
-gap:15px;
-margin-bottom:15px;
-font-weight:bold;
-}
-
-.news{
-background:white;
-padding:18px;
-margin:15px 0;
-border-radius:12px;
-box-shadow:0 2px 5px rgba(0,0,0,.1);
-}
-
-body.dark .news{
-background:#1e1e1e;
-}
-
-.news h3{
-margin-top:10px;
-}
-
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:20px;
-font-size:12px;
-background:#ddd;
-margin-bottom:10px;
-}
-
-body.dark .badge{
-background:#333;
-}
-
-.news-actions{
-margin-top:12px;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-a{
-text-decoration:none;
-}
-
-#aiBrief{
-background:#fff3cd;
-padding:15px;
-border-radius:12px;
-margin-bottom:20px;
-}
-
-body.dark #aiBrief{
-background:#2c2c2c;
-}
-
-.source{
-margin-top:10px;
-opacity:.8;
-font-size:14px;
-}
-
+body{font-family:Arial,sans-serif;background:#f4f4f4;color:#222;max-width:1200px;margin:auto;padding:20px;transition:.3s;}
+body.dark{background:#121212;color:#fff;}
+h1{text-align:center;}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+button{padding:10px 15px;cursor:pointer;border:none;border-radius:8px;}
+input{padding:10px;border-radius:8px;border:1px solid #ccc;flex:1;min-width:220px;}
+.stats{display:flex;gap:15px;margin-bottom:15px;font-weight:bold;}
+.news{background:white;padding:18px;margin:15px 0;border-radius:12px;box-shadow:0 2px 5px rgba(0,0,0,.1);}
+body.dark .news{background:#1e1e1e;}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;background:#ddd;margin-bottom:10px;}
+body.dark .badge{background:#333;}
+.news-actions{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;}
+#aiBrief{background:#fff3cd;padding:15px;border-radius:12px;margin-bottom:20px;}
+body.dark #aiBrief{background:#2c2c2c;}
+.source{margin-top:10px;opacity:.8;font-size:14px;}
+a{text-decoration:none;}
 </style>
-
 </head>
-
 <body>
 
 <h1>📰 Chetan News Dashboard</h1>
 
 <div class="controls">
-
 <button onclick="toggleTheme()">🌙 Dark Mode</button>
-
 <button onclick="loadNews('all')">🏠 All</button>
-
 <button onclick="loadNews('india')">🇮🇳 India</button>
-
 <button onclick="loadNews('cricket')">🏏 Cricket</button>
-
 <button onclick="loadNews('ai')">🤖 AI</button>
-
 <button onclick="loadNews('finance')">💰 Finance</button>
-
 <button onclick="loadNews('onepiece')">☠️ One Piece</button>
-
 <button onclick="loadNews('world')">🌍 World</button>
-
 <button onclick="loadNews('positive')">😊 Positive</button>
-
 <button onclick="showSaved()">⭐ Saved</button>
-
 <button onclick="loadNews(currentTopic)">🔄 Refresh</button>
-
 </div>
 
 <div class="controls">
-
-<input
-type="text"
-id="searchBox"
-placeholder="Search news..."
-onkeyup="searchNews()">
-
+<input type="text" id="searchBox" placeholder="Search news..." onkeyup="searchNews()">
 </div>
 
 <div class="stats">
@@ -163,270 +52,143 @@ onkeyup="searchNews()">
 </div>
 
 <div id="aiBrief">
-
 <h2>🧠 Today's AI Brief</h2>
-
-<ul id="briefList">
-<li>Loading AI news...</li>
-</ul>
-
+<ul id="briefList"><li>Loading AI news...</li></ul>
 </div>
 
-<div id="news">
-Loading...
-</div>
+<div id="news">Loading...</div>
 
 <script>
-
-const API =
-"https://my-news-api.cnucchi.workers.dev";
-
-let allArticles = [];
-let currentTopic = "all";
+const API="https://my-news-api.cnucchi.workers.dev";
+let allArticles=[];
+let currentTopic="all";
 
 async function loadNews(topic='all'){
-
-currentTopic = topic;
-
-const newsDiv =
-document.getElementById("news");
-
-newsDiv.innerHTML =
-"Loading news...";
-
-try{
-
-const response =
-await fetch(`${API}?topic=${topic}`);
-
-const articles =
-await response.json();
-
-allArticles = articles;
-
-renderNews(articles);
-
-updateSavedCount();
-
-}
-catch(error){
-
-console.error(error);
-
-newsDiv.innerHTML =
-"Error loading news.";
-
-}
-
+ currentTopic=topic;
+ document.getElementById("news").innerHTML="Loading news...";
+ try{
+   const response=await fetch(`${API}?topic=${topic}`);
+   const articles=await response.json();
+   allArticles=articles;
+   renderNews(articles);
+   updateSavedCount();
+ }catch(e){
+   document.getElementById("news").innerHTML="Error loading news.";
+ }
 }
 
 async function loadAIBrief(){
-
-try{
-
-const response =
-await fetch(`${API}?topic=ai`);
-
-const articles =
-await response.json();
-
-generateBrief(articles);
-
-}
-catch(err){
-
-document.getElementById("briefList")
-.innerHTML =
-"<li>Unable to load AI Brief</li>";
-
+ try{
+   const response=await fetch(`${API}?topic=ai`);
+   const articles=await response.json();
+   generateBrief(articles);
+ }catch(e){
+   document.getElementById("briefList").innerHTML="<li>Unable to load AI Brief</li>";
+ }
 }
 
+function getSaved(){
+ return JSON.parse(localStorage.getItem("savedNews") || "[]");
 }
 
 function renderNews(articles){
+ document.getElementById("articleCount").textContent=articles.length;
+ const saved=getSaved();
+ const newsDiv=document.getElementById("news");
 
-document.getElementById("articleCount")
-.textContent = articles.length;
+ if(!articles.length){
+   newsDiv.innerHTML="No articles found.";
+   return;
+ }
 
-const newsDiv =
-document.getElementById("news");
+ let html="";
 
-if(!articles.length){
+ articles.forEach((article,index)=>{
+   const isSaved=saved.some(x=>x.link===article.link);
 
-newsDiv.innerHTML =
-"No articles found.";
+   html+=`
+   <div class="news">
+     <div class="badge">${(article.category||'news').toUpperCase()}</div>
+     <h3>${article.title||''}</h3>
+     <p>${article.description||''}</p>
+     <div class="source">${article.source||''}</div>
 
-return;
+     <div class="news-actions">
+       <a href="${article.link}" target="_blank">
+         <button>📖 Read</button>
+       </a>
 
+       <button onclick="toggleSave(${index})">
+         ${isSaved ? '❌ Unsave' : '☆ Save'}
+       </button>
+     </div>
+   </div>`;
+ });
+
+ newsDiv.innerHTML=html;
 }
 
-let html = "";
+function toggleSave(index){
+ const article=allArticles[index];
+ let saved=getSaved();
 
-articles.forEach((article,index)=>{
+ const existing=saved.findIndex(x=>x.link===article.link);
 
-html += `
+ if(existing>=0){
+   saved.splice(existing,1);
+ }else{
+   saved.push(article);
+ }
 
-<div class="news">
-
-<div class="badge">
-${article.category.toUpperCase()}
-</div>
-
-<h3>${article.title}</h3>
-
-<p>${article.description || ""}</p>
-
-<div class="source">
-${article.source}
-</div>
-
-<div class="news-actions">
-
-<a href="${article.link}" target="_blank">
-<button>📖 Read</button>
-</a>
-
-<button onclick="saveArticleByIndex(${index})">
-⭐ Save
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-newsDiv.innerHTML = html;
-
-}
-
-function saveArticleByIndex(index){
-
-const article = allArticles[index];
-
-let saved =
-JSON.parse(
-localStorage.getItem("savedNews")
-|| "[]"
-);
-
-const exists =
-saved.some(item =>
-item.link === article.link
-);
-
-if(!exists){
-
-saved.push(article);
-
-localStorage.setItem(
-"savedNews",
-JSON.stringify(saved)
-);
-
-updateSavedCount();
-
-alert("Article Saved ⭐");
-
-}
-
+ localStorage.setItem("savedNews",JSON.stringify(saved));
+ updateSavedCount();
+ renderNews(allArticles);
 }
 
 function updateSavedCount(){
-
-const saved =
-JSON.parse(
-localStorage.getItem("savedNews")
-|| "[]"
-);
-
-document.getElementById("savedCount")
-.textContent = saved.length;
-
+ document.getElementById("savedCount").textContent=getSaved().length;
 }
 
 function showSaved(){
-
-const saved =
-JSON.parse(
-localStorage.getItem("savedNews")
-|| "[]"
-);
-
-renderNews(saved);
-
+ const saved=getSaved();
+ allArticles=saved;
+ renderNews(saved);
 }
 
 function searchNews(){
+ const term=document.getElementById("searchBox").value.toLowerCase();
 
-const term =
-document.getElementById("searchBox")
-.value
-.toLowerCase();
+ const filtered=allArticles.filter(a=>
+   (a.title||'').toLowerCase().includes(term) ||
+   (a.description||'').toLowerCase().includes(term)
+ );
 
-const filtered =
-allArticles.filter(article =>
-
-(article.title || "")
-.toLowerCase()
-.includes(term)
-
-||
-
-(article.description || "")
-.toLowerCase()
-.includes(term)
-
-);
-
-renderNews(filtered);
-
+ renderNews(filtered);
 }
 
 function generateBrief(articles){
+ const brief=document.getElementById("briefList");
+ brief.innerHTML='';
 
-const briefList =
-document.getElementById("briefList");
-
-briefList.innerHTML = "";
-
-articles
-.slice(0,5)
-.forEach(article=>{
-
-briefList.innerHTML +=
-`<li>${article.title}</li>`;
-
-});
-
+ articles.slice(0,5).forEach(article=>{
+   brief.innerHTML+=`<li>${article.title}</li>`;
+ });
 }
 
 function toggleTheme(){
-
-document.body.classList.toggle("dark");
-
-localStorage.setItem(
-"theme",
-document.body.classList.contains("dark")
-? "dark"
-: "light"
-);
-
+ document.body.classList.toggle("dark");
+ localStorage.setItem("theme",
+   document.body.classList.contains("dark") ? "dark" : "light"
+ );
 }
 
-if(
-localStorage.getItem("theme")
-=== "dark"
-){
-document.body.classList.add("dark");
+if(localStorage.getItem("theme")==="dark"){
+ document.body.classList.add("dark");
 }
 
 updateSavedCount();
 loadAIBrief();
 loadNews();
-
 </script>
 
 </body>
