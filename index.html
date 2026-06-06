@@ -97,7 +97,23 @@ return;
 
 let html = "";
 
-articles.forEach(article => {
+const seenTitles = new Set();
+
+articles
+.filter(article => {
+
+const title = (article.title || "").toLowerCase();
+
+if(seenTitles.has(title)){
+return false;
+}
+
+seenTitles.add(title);
+return true;
+
+})
+.slice(0,50)
+.forEach(article => {
 
 html += `
 <div class="news">
