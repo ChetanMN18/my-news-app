@@ -73,7 +73,6 @@ function render(){
  <h3>${a.title}</h3>
  <p>${a.description||''}</p>
  <div class="meta">${a.source} • ${rel(a.timestamp)}</div>
- <p>${a.pubDate||''}</p>
  <a href="${a.link}" target="_blank"><button>Read</button></a>
  <button onclick="save('${a.link}')">${saved().some(x=>x.link===a.link)?'Unsave':'Save'}</button>
  </div></div>`).join('');
