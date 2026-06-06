@@ -49,9 +49,16 @@ flex:1;
 min-width:220px;
 }
 
+.stats{
+display:flex;
+gap:15px;
+margin-bottom:15px;
+font-weight:bold;
+}
+
 .news{
 background:white;
-padding:15px;
+padding:18px;
 margin:15px 0;
 border-radius:12px;
 box-shadow:0 2px 5px rgba(0,0,0,.1);
@@ -62,12 +69,12 @@ background:#1e1e1e;
 }
 
 .news h3{
-margin-top:0;
+margin-top:10px;
 }
 
 .badge{
 display:inline-block;
-padding:4px 8px;
+padding:4px 10px;
 border-radius:20px;
 font-size:12px;
 background:#ddd;
@@ -79,9 +86,10 @@ background:#333;
 }
 
 .news-actions{
-margin-top:10px;
+margin-top:12px;
 display:flex;
 gap:10px;
+flex-wrap:wrap;
 }
 
 a{
@@ -97,6 +105,12 @@ margin-bottom:20px;
 
 body.dark #aiBrief{
 background:#2c2c2c;
+}
+
+.source{
+margin-top:10px;
+opacity:.8;
+font-size:14px;
 }
 
 </style>
@@ -129,6 +143,8 @@ background:#2c2c2c;
 
 <button onclick="showSaved()">⭐ Saved</button>
 
+<button onclick="loadNews(currentTopic)">🔄 Refresh</button>
+
 </div>
 
 <div class="controls">
@@ -139,6 +155,11 @@ id="searchBox"
 placeholder="Search news..."
 onkeyup="searchNews()">
 
+</div>
+
+<div class="stats">
+<div>📰 Articles: <span id="articleCount">0</span></div>
+<div>⭐ Saved: <span id="savedCount">0</span></div>
 </div>
 
 <div id="aiBrief">
@@ -161,8 +182,11 @@ const API =
 "https://my-news-api.cnucchi.workers.dev";
 
 let allArticles = [];
+let currentTopic = "all";
 
 async function loadNews(topic='all'){
+
+currentTopic = topic;
 
 const newsDiv =
 document.getElementById("news");
@@ -182,9 +206,7 @@ allArticles = articles;
 
 renderNews(articles);
 
-if(topic === 'ai'){
-generateBrief(articles);
-}
+updateSavedCount();
 
 }
 catch(error){
@@ -198,7 +220,33 @@ newsDiv.innerHTML =
 
 }
 
+async function loadAIBrief(){
+
+try{
+
+const response =
+await fetch(`${API}?topic=ai`);
+
+const articles =
+await response.json();
+
+generateBrief(articles);
+
+}
+catch(err){
+
+document.getElementById("briefList")
+.innerHTML =
+"<li>Unable to load AI Brief</li>";
+
+}
+
+}
+
 function renderNews(articles){
+
+document.getElementById("articleCount")
+.textContent = articles.length;
 
 const newsDiv =
 document.getElementById("news");
@@ -214,7 +262,7 @@ return;
 
 let html = "";
 
-articles.forEach(article=>{
+articles.forEach((article,index)=>{
 
 html += `
 
@@ -226,25 +274,19 @@ ${article.category.toUpperCase()}
 
 <h3>${article.title}</h3>
 
-<p>${article.description}</p>
+<p>${article.description || ""}</p>
 
-<small>
+<div class="source">
 ${article.source}
-</small>
+</div>
 
 <div class="news-actions">
 
-<a href="${article.link}"
-target="_blank">
-
-<button>
-📖 Read
-</button>
-
+<a href="${article.link}" target="_blank">
+<button>📖 Read</button>
 </a>
 
-<button
-onclick='saveArticle(${JSON.stringify(article)})'>
+<button onclick="saveArticleByIndex(${index})">
 ⭐ Save
 </button>
 
@@ -260,43 +302,17 @@ newsDiv.innerHTML = html;
 
 }
 
-function searchNews(){
+function saveArticleByIndex(index){
 
-const term =
-document.getElementById("searchBox")
-.value
-.toLowerCase();
-
-const filtered =
-allArticles.filter(article =>
-
-article.title
-.toLowerCase()
-.includes(term)
-
-||
-
-article.description
-.toLowerCase()
-.includes(term)
-
-);
-
-renderNews(filtered);
-
-}
-
-function saveArticle(article){
+const article = allArticles[index];
 
 let saved =
-
 JSON.parse(
 localStorage.getItem("savedNews")
 || "[]"
 );
 
 const exists =
-
 saved.some(item =>
 item.link === article.link
 );
@@ -310,16 +326,30 @@ localStorage.setItem(
 JSON.stringify(saved)
 );
 
-alert("Saved!");
+updateSavedCount();
+
+alert("Article Saved ⭐");
 
 }
+
+}
+
+function updateSavedCount(){
+
+const saved =
+JSON.parse(
+localStorage.getItem("savedNews")
+|| "[]"
+);
+
+document.getElementById("savedCount")
+.textContent = saved.length;
 
 }
 
 function showSaved(){
 
 const saved =
-
 JSON.parse(
 localStorage.getItem("savedNews")
 || "[]"
@@ -329,17 +359,42 @@ renderNews(saved);
 
 }
 
+function searchNews(){
+
+const term =
+document.getElementById("searchBox")
+.value
+.toLowerCase();
+
+const filtered =
+allArticles.filter(article =>
+
+(article.title || "")
+.toLowerCase()
+.includes(term)
+
+||
+
+(article.description || "")
+.toLowerCase()
+.includes(term)
+
+);
+
+renderNews(filtered);
+
+}
+
 function generateBrief(articles){
 
 const briefList =
 document.getElementById("briefList");
 
-const topFive =
-articles.slice(0,5);
-
 briefList.innerHTML = "";
 
-topFive.forEach(article=>{
+articles
+.slice(0,5)
+.forEach(article=>{
 
 briefList.innerHTML +=
 `<li>${article.title}</li>`;
@@ -368,6 +423,8 @@ localStorage.getItem("theme")
 document.body.classList.add("dark");
 }
 
+updateSavedCount();
+loadAIBrief();
 loadNews();
 
 </script>
